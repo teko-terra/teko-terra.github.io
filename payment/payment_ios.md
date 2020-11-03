@@ -1,4 +1,4 @@
-# [Installation & Setup](#installation)
+# Installation
 
 Using **[CocoaPods](https://cocoapods.org/)**
 
@@ -10,7 +10,7 @@ pod 'Minerva', :source => 'https://github.com/teko-vn/Specs-ios'
 
 Don't forget to execute command `pod install`
 
-# [Configuration](#configuration)
+# Configuration
 
 Before using Minerva, we have to set up a `MinervaConfig`
 
@@ -24,11 +24,12 @@ let config = MinervaConfig(
 )
 ```
 
-# [Add payment methods](#add-payment-methods)
+# Add payment methods
 
 ```swift
-let cttConfig = CTTPaymentConfig(partnerCode: partnerCode)
-try PaymentGateway.addConfig(cttConfig, forMethod: .qr)
+let cttMethod = CTTMethod(config: .init(), methodCode: CTTMethod.cttCode)
+let atmMethod = ATMMethod(config: .init(), methodCode: ATMMethod.atmCode)
+Minerva.shared.setPaymentMethods(methods: [cttMethod, atmMethod])
 ```
 
 Finally, add payment methods to the `gateway`
@@ -37,27 +38,30 @@ Finally, add payment methods to the `gateway`
 PaymentGateway.addPaymentMethods([.qr, .spos])
 ```
 
-# [Create transaction](#create_transaction)
+# Create transaction
 
 ```swift
 let request = CTTTransactionRequest(orderId: orderId,
                                     orderCode: orderCode,
-                                    amount: amount, 
-                                    expireTime: expireTime)                                     
+                                    amount: amount)                                     
 ```
 
 ```swift
-try paymentGateway.pay(method: .qr, request: request, completion: { result in
-    switch result {
-    case .success(let transaction):
-        // Do something
-    case .failure(let error):
-        // Handle error
-    }
-})  
+do {
+    try Minerva.shared.pay(method: CTTMethod.cttCode, request: request, completion: { result in
+        switch result {
+        case .success(let transaction):
+            onSuccess(QRCodeData(transactionCode: transaction.code, qrContent: transaction.qrContent))
+        case .failure(let error):
+            onError(error.localizedDescription)
+        }
+    })
+} catch {
+    onError(error.localizedDescription)
+} 
 ```
 
-# [Observe transaction result](#observe-transaction-result)
+# Observe transaction result
 
 In the screen where you want to observe the transaction result, you need to create a `PaymentObserver`
 
