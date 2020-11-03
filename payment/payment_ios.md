@@ -26,25 +26,36 @@ let config = MinervaConfig(
 
 # Add payment methods
 
+`Minerva` currently supports following payment methods
+- QR code via CTT
+- ATM via VNPay gateway
+- SPOS
+
+Before create a transaction with one of these methods, you need to add it by `setPaymentMethods`
+
 ```swift
 let cttMethod = CTTMethod(config: .init(), methodCode: CTTMethod.cttCode)
 let atmMethod = ATMMethod(config: .init(), methodCode: ATMMethod.atmCode)
 Minerva.shared.setPaymentMethods(methods: [cttMethod, atmMethod])
 ```
 
-Finally, add payment methods to the `gateway`
+Finally, add payment methods to the `Minerva`
 
 ```swift
-PaymentGateway.addPaymentMethods([.qr, .spos])
+Minerva.shared.addPaymentMethods([cttMethod, atmMethod])
 ```
 
 # Create transaction
+
+First we need to create a transaction request.
 
 ```swift
 let request = CTTTransactionRequest(orderId: orderId,
                                     orderCode: orderCode,
                                     amount: amount)                                     
 ```
+
+And then call `pay` function with a respective method along with this request.
 
 ```swift
 do {
@@ -66,6 +77,7 @@ do {
 In the screen where you want to observe the transaction result, you need to create a `PaymentObserver`
 
 ```swift
+let observe = PaymentObserver()
 observer.observe(transactionCode: transactionCode) { result in
     switch result {
     case .success:
