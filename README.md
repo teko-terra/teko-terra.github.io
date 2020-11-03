@@ -1,6 +1,6 @@
 # Introduction
 
-> An awesome project.
+> Terra document
 
 # Quick start
 
