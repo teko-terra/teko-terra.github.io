@@ -27,8 +27,8 @@ let config = MinervaConfig(
 # Add payment methods
 
 `Minerva` currently supports following payment methods
-- QR code via CTT
-- ATM via VNPay gateway
+- QRCODE through CTT
+- ATM through VNPay gateway
 - SPOS
 
 Before create a transaction with one of these methods, you need to add it by `setPaymentMethods`
@@ -62,7 +62,7 @@ do {
     try Minerva.shared.pay(method: CTTMethod.cttCode, request: request, completion: { result in
         switch result {
         case .success(let transaction):
-            onSuccess(QRCodeData(transactionCode: transaction.code, qrContent: transaction.qrContent))
+            onSuccess(transaction)
         case .failure(let error):
             onError(error.localizedDescription)
         }
